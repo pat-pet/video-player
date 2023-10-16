@@ -63,9 +63,13 @@ fun DetailScreen(
     contentVideo: ContentVideoModel?,
     commentList: ResultState<List<CommentModel>>,
     commentText: String,
+    likes: String,
+    dislikes: String,
     onCommentTextChanged: (String) -> Unit,
     onCommentSubmitted: () -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    addLikes : () -> Unit,
+    minLikes : () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,11 +80,20 @@ fun DetailScreen(
         val defaultDataSourceFactory = DefaultDataSource.Factory(context)
         val dataSourceFactory = DefaultDataSource.Factory(context, defaultDataSourceFactory)
         val source = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(video)
-        exoPlayer.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
         exoPlayer.setMediaSource(source)
-        exoPlayer.prepare()
         exoPlayer.playWhenReady = true
+        exoPlayer.prepare()
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                super.onPlaybackStateChanged(state)
+                if (state == Player.STATE_BUFFERING) {
+                    exoPlayer.pause()
+                } else {
+                    exoPlayer.play()
+                }
+            }
+        })
     }
 
     DisposableEffect(exoPlayer) {
@@ -156,23 +169,27 @@ fun DetailScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ThumbUp,
-                                contentDescription = "Like Icon"
-                            )
-                            Text(contentVideo?.likes.toString())
+                            IconButton(onClick = addLikes) {
+                                Icon(
+                                    imageVector = Icons.Default.ThumbUp,
+                                    contentDescription = "Like Icon"
+                                )
+                            }
+                            Text(likes)
                             Spacer(
                                 modifier = Modifier
                                     .height(height = 20.dp)
                                     .width(width = 2.dp)
                                     .background(color = MaterialTheme.colorScheme.onBackground)
                             )
-                            Icon(
-                                imageVector = Icons.Default.ThumbUp,
-                                contentDescription = "Like Icon",
-                                modifier = Modifier.rotate(180f)
-                            )
-                            Text(contentVideo?.dislikes.toString())
+                            IconButton(onClick = minLikes ) {
+                                Icon(
+                                    imageVector = Icons.Default.ThumbUp,
+                                    contentDescription = "Like Icon",
+                                    modifier = Modifier.rotate(180f)
+                                )
+                            }
+                            Text(dislikes)
                         }
                     }
                 }
@@ -272,7 +289,11 @@ fun DetailScreenPreview() {
             onBackPressed = { },
             commentText = "",
             onCommentTextChanged = { },
-            onCommentSubmitted = { }
+            onCommentSubmitted = { },
+            likes = "0",
+            dislikes = "0",
+            addLikes = {},
+            minLikes = {}
         )
     }
 }

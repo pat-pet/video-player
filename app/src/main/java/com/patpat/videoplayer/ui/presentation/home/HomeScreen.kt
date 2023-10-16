@@ -70,9 +70,7 @@ fun HomeScreen(
             contentPadding = PaddingValues(14.dp)
         ) {
             if (isLoading) {
-                item(span = {
-                    GridItemSpan(2)
-                }) {
+                item(span = { GridItemSpan(2) }) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth(),
@@ -130,9 +128,7 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.width(14.dp))
                             Text(
                                 video.likes.toString(),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    color = Color(0xFFFFC609)
-                                )
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFFFFC609))
                             )
                         }
                     }
@@ -148,9 +144,7 @@ fun HomeScreenPreview() {
     Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         HomeScreen(
             videos = emptyList(),
-            onClick = {
-
-            },
+            onClick = { },
             isLoading = false
         )
     }

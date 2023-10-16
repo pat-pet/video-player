@@ -7,10 +7,8 @@ import com.google.firebase.ktx.Firebase
 import com.patpat.videoplayer.data.models.CommentResponse
 import com.patpat.videoplayer.data.models.ContentVideoResponse
 import com.patpat.videoplayer.domain.usecases.utils.None
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -32,11 +30,9 @@ class NetworkDataSourceImpl @Inject constructor() : NetworkDataSource {
 
             firestore.collection(ContentVideoResponse.REFERENCE_NAME)
                 .document(videoId)
-                .set(
-                    hashMapOf(
-                        "likes" to (video.get("likes").toString().toIntOrNull() ?: 0).plus(1)
-                            .toDouble()
-                    )
+                .update(
+                    "likes",
+                    video.get("likes").toString().toDouble().toInt().plus(1).toDouble()
                 )
                 .await()
 
@@ -53,11 +49,9 @@ class NetworkDataSourceImpl @Inject constructor() : NetworkDataSource {
 
             firestore.collection(ContentVideoResponse.REFERENCE_NAME)
                 .document(videoId)
-                .set(
-                    hashMapOf(
-                        "dislikes" to (video.get("dislikes").toString().toIntOrNull() ?: 0).plus(1)
-                            .toDouble()
-                    )
+                .update(
+                    "dislikes",
+                    video.get("dislikes").toString().toDouble().plus(1).toDouble()
                 )
                 .await()
 
@@ -94,8 +88,8 @@ class NetworkDataSourceImpl @Inject constructor() : NetworkDataSource {
                     url = it.getString("url"),
                     title = it.getString("title"),
                     subtitle = it.getString("subtitle"),
-                    likes = it.get("likes").toString().toIntOrNull() ?: 0,
-                    dislikes = it.get("dislikes").toString().toIntOrNull() ?: 0,
+                    likes = it.get("likes").toString().toDouble().toInt(),
+                    dislikes = it.get("dislikes").toString().toDouble().toInt(),
                     thumbnailUrl = it.getString("thumbnail_url"),
                     id = it.id
                 )
@@ -111,8 +105,8 @@ class NetworkDataSourceImpl @Inject constructor() : NetworkDataSource {
                     url = it?.getString("url"),
                     title = it?.getString("title"),
                     subtitle = it?.getString("subtitle"),
-                    likes = it?.get("likes").toString().toIntOrNull() ?: 0,
-                    dislikes = it?.get("dislikes").toString().toIntOrNull() ?: 0,
+                    likes = it?.get("likes").toString().toDouble().toInt(),
+                    dislikes = it?.get("dislikes").toString().toDouble().toInt(),
                     thumbnailUrl = it?.getString("thumbnail_url"),
                     id = it?.id
                 )

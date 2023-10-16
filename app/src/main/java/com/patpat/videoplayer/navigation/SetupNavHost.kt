@@ -86,6 +86,10 @@ fun SetupNavHost(navController: NavHostController) {
                 viewModel.initData(video?.id.orEmpty())
             }
 
+            LaunchedEffect(key1 = true) {
+                viewModel.observeVideo(videoId = video?.id.orEmpty())
+            }
+
             DetailScreen(
                 contentVideo = video,
                 commentText = comment,
@@ -96,7 +100,15 @@ fun SetupNavHost(navController: NavHostController) {
                 onBackPressed = {
                     navController.popBackStack()
                 },
-                commentList = comments
+                commentList = comments,
+                likes = viewModel.likes,
+                dislikes = viewModel.dislikes,
+                addLikes = {
+                    viewModel.addLikes(video?.id.orEmpty())
+                },
+                minLikes = {
+                    viewModel.minLikes(video?.id.orEmpty())
+                },
             )
         }
     }
